@@ -7,8 +7,9 @@ import com.maurya.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.nio.channels.FileChannel;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -54,5 +55,36 @@ public class ProductService {
                     Product updatedProduct = productRepository.save(existing);
                     return mapToProductResponse(updatedProduct);
                 });
+    }
+
+    public Boolean deleteProduct(Long id) {
+        return productRepository.findById(id)
+                .map(existing ->{
+                            existing.setActive(false);
+                            productRepository.save(existing);
+                            return true;
+                }).orElse(false);
+    }
+
+    public List<ProductResponse> fetchAllProducts() {
+
+        return productRepository.findAll()
+                .stream()
+                .map(this::mapToProductResponse)
+                .collect(Collectors.toList());
+    }
+
+    public Optional<ProductResponse> fetchProduct(Long id) {
+
+        return productRepository.findById(id)
+                .map(this::mapToProductResponse);
+    }
+
+    public List<ProductResponse> searchProduct(String keyword) {
+
+        return productRepository.searchProduct(keyword)
+                .stream()
+                .map(this::mapToProductResponse)
+                .collect(Collectors.toList());
     }
 }
