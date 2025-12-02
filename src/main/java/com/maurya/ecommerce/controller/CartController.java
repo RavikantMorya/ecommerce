@@ -2,6 +2,7 @@ package com.maurya.ecommerce.controller;
 
 import com.maurya.ecommerce.dtos.CartItemRequest;
 import com.maurya.ecommerce.service.CartService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
+@Transactional
 public class CartController {
 
     private final CartService cartService;
@@ -22,4 +24,16 @@ public class CartController {
        return ResponseEntity.badRequest().body("Product Out of Stock or User not found or Product not Found!");
 
     }
+
+    @DeleteMapping("/items/{productId}")
+    public ResponseEntity<Void> removeFromCart(@RequestHeader("X-USER-ID") String userId,
+                                               @PathVariable String productId)
+    {
+
+       boolean deleted = cartService.removeItemFromCart(userId,productId);
+       if (deleted)
+            return ResponseEntity.noContent().build();
+       return ResponseEntity.notFound().build();
+    }
+
 }

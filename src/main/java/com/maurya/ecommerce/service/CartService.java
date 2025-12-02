@@ -52,4 +52,15 @@ public class CartService {
         return true;
 
     }
+
+    public boolean removeItemFromCart(String userId, String productId) {
+
+        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
+        Optional<Product> productOpt = productRepository.findById(Long.valueOf(productId));
+        if (userOpt.isPresent() && productOpt.isPresent()) {
+            cartRepository.deleteByUserAndProduct(userOpt.get(),productOpt.get());
+            return true;
+        }
+        return false;
+    }
 }
