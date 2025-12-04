@@ -1,6 +1,7 @@
 package com.maurya.ecommerce.service;
 
 import com.maurya.ecommerce.dtos.CartItemRequest;
+import com.maurya.ecommerce.dtos.CartItemResponse;
 import com.maurya.ecommerce.model.CartItem;
 import com.maurya.ecommerce.model.Product;
 import com.maurya.ecommerce.model.User;
@@ -11,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,4 +66,27 @@ public class CartService {
         }
         return false;
     }
+
+    public List<CartItemResponse> fetchCartItems(String userId) {
+
+        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
+
+        return userOpt.map(user -> cartRepository.findAllByUser(user)
+                .stream()
+                .map(this::mapToCarResponse)
+                .collect(Collectors.toList())).orElseGet(List::of);
+    }
+
+    private CartItemResponse mapToCarResponse(CartItem cartItem) {
+
+        CartItemResponse  response= new CartItemResponse();
+        response.setProduct(cartItem.getProduct());
+        response.setQuantity(cartItem.getQuantity());
+        response.setPrice(cartItem.getPrice());
+        response.setCreatedAt(cartItem.getCreatedAt());
+        response.setUpdatedAt(cartItem.getUpdatedAt());
+        return response;
+    }
+
+
 }

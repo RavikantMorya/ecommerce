@@ -1,12 +1,15 @@
 package com.maurya.ecommerce.controller;
 
 import com.maurya.ecommerce.dtos.CartItemRequest;
+import com.maurya.ecommerce.dtos.CartItemResponse;
 import com.maurya.ecommerce.service.CartService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -34,6 +37,12 @@ public class CartController {
        if (deleted)
             return ResponseEntity.noContent().build();
        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CartItemResponse>> getCartItems(@RequestHeader("X-USER-ID") String userId)
+    {
+       return ResponseEntity.ok(cartService.fetchCartItems(userId));
     }
 
 }
