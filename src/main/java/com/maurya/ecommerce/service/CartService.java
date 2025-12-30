@@ -8,6 +8,7 @@ import com.maurya.ecommerce.model.User;
 import com.maurya.ecommerce.repository.CartRepository;
 import com.maurya.ecommerce.repository.ProductRepository;
 import com.maurya.ecommerce.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CartService {
 
     private final CartRepository cartRepository;
@@ -67,6 +69,16 @@ public class CartService {
         return false;
     }
 
+    public List<CartItem> getCartItems(String userId)
+    {
+        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
+        if (userOpt.isPresent()){
+            User user = userOpt.get();
+            return cartRepository.findAllByUser(user);
+        }
+        return List.of();
+    }
+
     public List<CartItemResponse> fetchCartItems(String userId) {
 
         Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
@@ -89,4 +101,8 @@ public class CartService {
     }
 
 
+    public void clearCart(String userId) {
+        Optional<User> userOpt = userRepository.findById(Long.valueOf(userId));
+        userOpt.ifPresent(cartRepository::deleteByUser);
+    }
 }
